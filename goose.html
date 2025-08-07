@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>거위의 방 입장</title>
+  <style>
+    body { text-align: center; margin-top: 100px; font-family: sans-serif; }
+    input { padding: 10px; font-size: 18px; }
+    button { padding: 10px 20px; font-size: 18px; margin-left: 10px; }
+    #annoyingGoose {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: black url('annoying_goose.jpg') center center no-repeat;
+      background-size: contain;
+      display: none;
+      z-index: 9999;
+    }
+  </style>
+  <script>
+    function enterRoom() {
+      const pw = document.getElementById("pw").value.trim();
+      if (pw === "goose") {
+        window.location.href = "goose_inside.html";
+      } else {
+        const annoying = document.getElementById('annoyingGoose');
+        annoying.style.display = 'block';
+        document.getElementById('sound').play();
+        setTimeout(() => {
+          annoying.style.display = 'none';
+        }, 1001);
+      }
+    }
+  </script>
+</head>
+<body>
+  <h2>🪿 거위의 방 🪿</h2>
+  <p>암호를 입력하세요</p>
+  <input type="password" id="pw" placeholder="비밀번호">
+  <button onclick="enterRoom()">입장</button>
+
+  <div id="annoyingGoose"></div>
+
+  <audio id="sound" src="https://raw.githubusercontent.com/yoonjaekoo/koo1331207/main/99D8284A5D0BCC8005.mp3"></audio>
+</body>
+</html>

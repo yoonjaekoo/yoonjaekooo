@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>자유게시판</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      background-color: black;
+      color: skyblue;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    input, textarea, button {
+      background-color: gray;
+      color: skyblue;
+      border: none;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .post {
+      border: 1px solid skyblue;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      position: relative;
+    }
+    .post-title {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .post-content {
+      margin-top: 5px;
+    }
+    .delete-btn {
+      position: absolute;
+      right: 10px;
+      top: 10px;
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    #clearBtn {
+      background-color: darkred;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>자유게시판</h1>
+  <input type="text" id="title" placeholder="제목">
+  <textarea id="content" placeholder="내용" rows="4"></textarea>
+  <button onclick="addPost()">글쓰기</button>
+  <button id="clearBtn" onclick="clearPosts()">전체 삭제</button>
+  <div id="posts"></div>
+
+  <script>
+    const postsDiv = document.getElementById('posts');
+
+    function loadPosts() {
+      const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+      postsDiv.innerHTML = '';
+      posts.reverse().forEach(({title, content, id}) => {
+        addPostToDOM(title, content, id);
+      });
+    }
+
+    function addPostToDOM(title, content, id) {
+      const post = document.createElement('div');
+      post.className = 'post';
+
+      const postTitle = document.createElement('div');
+      postTitle.className = 'post-title';
+      postTitle.textContent = title;
+
+      const postContent = document.createElement('div');
+      postContent.className = 'post-content';
+      postContent.textContent = content;
+
+      const delBtn = document.createElement('button');
+      delBtn.textContent = '삭제';
+      delBtn.className = 'delete-btn';
+      delBtn.onclick = () => deletePost(id);
+
+      post.appendChild(postTitle);
+      post.appendChild(postContent);
+      post.appendChild(delBtn);
+
+      postsDiv.appendChild(post);
+    }
+
+    function addPost() {
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('content').value.trim();
+      if (!title || !content) {
+        alert('제목과 내용을 모두 입력하세요.');
+        return;
+      }
+
+      const posts = JSON.parse(localStorage.getItem('posts') || '[]');
+      const id = Date.now(); // 고유 ID
+      posts.push({title, content, id});
+      localStorage.setItem('posts', JSON.stringify(posts));
+      loadPosts();
+
+      document.getElementById('title').value = '';
+      document.getElementById('content').value = '';
+    }
+
+    function deletePost(id) {
+      let posts = JSON.parse(localStorage.getItem('posts') || '[]');
+      posts = posts.filter(post => post.id !== id);
+      localStorage.setItem('posts', JSON.stringify(posts));
+      loadPosts();
+    }
+
+    function clearPosts() {
+      if (confirm("정말 전체 삭제할까요?")) {
+        localStorage.removeItem('posts');
+        loadPosts();
+      }
+    }
+
+    loadPosts();
+  </script>
+</body>
+</html>

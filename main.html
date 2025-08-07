@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>메인 페이지</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+      margin-top: 50px;
+    }
+
+    #goose {
+      width: 150px;
+      cursor: pointer;
+      margin-top: 30px;
+    }
+
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>윤재 웹사이트에 오신 것을 환영합니다</h1>
+  <p>당신은 윤재거나 윤재의 지인이군요!!!!!ヾ(•ω•`)o</p>
+  <p>거위 인형을 클릭해보세요! 제가 키우는 거위입니다. 뭐라고 하고있네요!</p>
+
+  <!-- 버튼들 -->
+  <div>
+    <button onclick="go1()">cps test</button>
+    <button onclick="go2()">자유게시판</button>
+    <button onclick="go3()">거위의 방</button>
+  </div>
+
+  <!-- 거위 이미지: 버튼들 바로 아래! -->
+  <img id="goose" src="goose.jpg" onclick="document.getElementById('jokbal').play()" alt="거위" />
+
+  <!-- 오디오 -->
+  <audio id="jokbal" src="https://raw.githubusercontent.com/yoonjaekoo/koo1331207/main/%EC%9E%A5%EC%B6%A9%EB%8F%99%20%EC%99%95%EC%A1%B1%EB%B0%9C%20%EB%B3%B4%EC%8C%88.mp3"></audio>
+
+  <!-- 자바스크립트 -->
+  <script>
+    function go1() {
+      window.location.href = "cps_test.html";
+    }
+
+    function go2() {
+      window.location.href = "posts.html";
+    }
+
+    function go3() {
+      window.location.href = "goose.html";
+    }
+  </script>
+</body>
+</html>

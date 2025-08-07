@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<html>
+<head>
+  <title>CPS 테스트</title>
+  <style>
+    body {
+      background-color: black;
+      color: skyblue;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    #clickBtn {
+      width: 150px;
+      height: 150px;
+      font-size: 24px;
+      background-color: gray;
+      color: skyblue;
+      border: none;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background-color 0.3s;
+    }
+    #clickBtn:active {
+      background-color: #555;
+    }
+    #clickBtn:disabled {
+      background-color: #333;
+      cursor: not-allowed;
+      color: #777;
+    }
+    input, label {
+      font-size: 18px;
+      background-color: black;
+      color: skyblue;
+      border: 1px solid skyblue;
+      padding: 5px 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+    #result, #countdown, #refreshMsg {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>CPS 테스트</h1>
+  <label for="timeInput">시간 (초): </label>
+  <input type="number" id="timeInput" value="5" min="1" max="60"><br>
+  <button id="clickBtn">클릭!</button>
+  <div id="countdown"></div>
+  <div id="result"></div>
+  <div id="refreshMsg" style="color: orange; margin-top: 15px;"></div>
+
+  <script>
+    let clicks = 0;
+    let startTime = null;
+    let running = false;
+    let timer;
+
+    const btn = document.getElementById('clickBtn');
+    const result = document.getElementById('result');
+    const countdown = document.getElementById('countdown');
+    const timeInput = document.getElementById('timeInput');
+    const refreshMsg = document.getElementById('refreshMsg');
+
+    btn.addEventListener('click', () => {
+      const totalTime = Number(timeInput.value);
+      if (totalTime < 1 || totalTime > 60) {
+        alert('시간은 1초 이상 60초 이하로 입력하세요.');
+        return;
+      }
+
+      if (!running) {
+        running = true;
+        clicks = 0;
+        startTime = Date.now();
+        countdown.textContent = totalTime + '초 남음';
+        result.textContent = '';
+        refreshMsg.textContent = '';
+        btn.disabled = false;
+
+        timer = setInterval(() => {
+          const elapsed = (Date.now() - startTime) / 1000;
+          const left = Math.max(0, totalTime - elapsed).toFixed(1);
+          countdown.textContent = left + '초 남음';
+
+          if (elapsed >= totalTime) {
+            clearInterval(timer);
+            const cps = (clicks / totalTime).toFixed(2);
+            result.textContent = cps + ' CPS';
+            countdown.textContent = '시간 종료!';
+            running = false;
+            btn.disabled = true;
+            refreshMsg.textContent = '테스트가 끝났습니다. 새로고침(F5)해서 다시 시작하세요.';
+          }
+        }, 100);
+      }
+      if (running) clicks++;
+    });
+  </script>
+</body>
+</html>

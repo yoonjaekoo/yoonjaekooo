@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>비밀번호 확인 + 족발 소리</title>
+  <script>
+    function checkPassword() {
+      const pw = document.getElementById("pw").value;
+      if (pw === "koo131207") {
+        location.href = "main.html";
+      } else {
+        alert("장충동 왕족발 보쌈!!!!!\n비밀번호 틀림!!!!");
+        const iframe = document.getElementById("jokbalSound");
+        iframe.src = iframe.src; // iframe 새로고침해서 소리 재생 시도
+      }
+    }
+
+    window.onload = () => {
+      const input = document.getElementById("pw");
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault(); // 기본 submit 막기
+          document.getElementById("checkBtn").click();
+        }
+      });
+    };
+  </script>
+</head>
+<body>
+  <div style="text-align:center; margin-top:50px;">
+    <img src="https://media.tenor.com/rr6G_nGWSkoAAAAj/oiiaioiiai.gif" width="150" alt="GIF" /><br />
+    <h2>비밀번호 입력</h2>
+    <iframe
+      id="jokbalSound"
+      width="110"
+      height="200"
+      src="https://www.myinstants.com/instant/jangcungdong-wangjogbal-bossam-15039/embed/"
+      frameborder="0"
+      scrolling="no"
+      title="족발 소리"
+    ></iframe>
+    <br />
+    <input type="password" id="pw" style="font-size:16px; padding:5px;" />
+    <button id="checkBtn" onclick="checkPassword()" style="font-size:16px; padding:5px 10px; margin-left:5px;">
+      확인
+    </button>
+  </div>
+</body>
+</html>

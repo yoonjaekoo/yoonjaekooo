@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<title>클릭 횟수 게임</title>
+<style>
+  body { text-align: center; font-family: sans-serif; margin-top: 50px; }
+  button { font-size: 24px; padding: 20px 40px; cursor: pointer; }
+  #count, #best { font-size: 30px; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<h1>클릭 횟수 게임</h1>
+<button id="click-btn">누를 때마다 +1</button>
+<div id="count">현재 클릭: 0</div>
+<div id="best">최고 기록: 0</div>
+
+<script>
+  let count = 0;
+  const btn = document.getElementById('click-btn');
+  const countDiv = document.getElementById('count');
+  const bestDiv = document.getElementById('best');
+
+  async function fetchBest() {
+    const res = await fetch('/best');
+    if (res.ok) {
+      const data = await res.json();
+      bestDiv.textContent = '최고 기록: ' + data.best;
+    }
+  }
+
+  fetchBest();
+
+  btn.onclick = async () => {
+    count++;
+    const API_BASE = 'https://koo1331207.onrender.com';
+    fetch(`${API_BASE}/best`), {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({score: count})
+    });
+    if (res.ok) {
+      const data = await res.json();
+      bestDiv.textContent = '최고 기록: ' + data.best;
+    }
+  };
+</script>
+
+</body>
+</html>
