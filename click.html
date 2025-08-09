@@ -21,12 +21,13 @@
   const btn = document.getElementById('click-btn');
   const countDiv = document.getElementById('count');
   const bestDiv = document.getElementById('best');
+  const API_BASE = 'https://koo131207-nodejs.onrender.com';
 
   async function fetchBest() {
-    const res = await fetch('/best');
+    const res = await fetch(`${API_BASE}/best`);
     if (res.ok) {
       const data = await res.json();
-      bestDiv.textContent = '최고 기록: ' + data.best;
+      bestDiv.textContent = '최고 기록: ' + data.bestScore;
     }
   }
 
@@ -34,15 +35,17 @@
 
   btn.onclick = async () => {
     count++;
-    const API_BASE = 'https://koo1331207.onrender.com';
-    fetch(`${API_BASE}/best`), {
+    countDiv.textContent = '현재 클릭: ' + count;
+
+    const res = await fetch(`${API_BASE}/best`, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({score: count})
     });
+
     if (res.ok) {
       const data = await res.json();
-      bestDiv.textContent = '최고 기록: ' + data.best;
+      bestDiv.textContent = '최고 기록: ' + data.bestScore;
     }
   };
 </script>
