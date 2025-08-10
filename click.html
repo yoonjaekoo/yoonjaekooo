@@ -12,10 +12,10 @@
   <p>최고 기록: <span id="best">0</span></p>
 
   <script>
-    const supabaseUrl = 'https://koo131207.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96ZnNwZHVsemtjamZ1aHhweGRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDMyODMsImV4cCI6MjA2OTgxOTI4M30.aWNRfnlcgtXwJPX4qYsHzIbbX7E_J9Zq_xsLRt_z2Es';
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
     const { data, error } = await supabaseClient.from('clicks').select('*');
+    const supabaseUrl = 'https://koo131207.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96ZnNwZHVsemtjamZ1aHhweGRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDMyODMsImV4cCI6MjA2OTgxOTI4M30.aWNRfnlcgtXwJPX4qYsHzIbbX7E_J9Zq_xsLRt_z2Es';
     let count = 0;
     let best = 0;
 
@@ -58,5 +58,6 @@
   </script>
 </body>
 </html>
+
 
 
