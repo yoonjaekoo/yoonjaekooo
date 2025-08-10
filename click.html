@@ -12,10 +12,10 @@
   <p>최고 기록: <span id="best">0</span></p>
 
   <script>
-    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
-    const { data, error } = await supabaseClient.from('clicks').select('*');
     const supabaseUrl = 'https://koo131207.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96ZnNwZHVsemtjamZ1aHhweGRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDMyODMsImV4cCI6MjA2OTgxOTI4M30.aWNRfnlcgtXwJPX4qYsHzIbbX7E_J9Zq_xsLRt_z2Es';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
     let count = 0;
     let best = 0;
 
@@ -31,7 +31,7 @@
         best = count;
         bestEl.textContent = best;
 
-        const { error } = await supabase
+        const { error } = await supabaseClient
           .from('clicks')
           .upsert([{ id: 1, best_clicks: best }]);
 
@@ -42,7 +42,7 @@
     });
 
     (async () => {
-      const { data, error } = await supabase
+      const { data, error } = await supabaseClient
         .from('clicks')
         .select('best_clicks')
         .eq('id', 1)
@@ -58,6 +58,3 @@
   </script>
 </body>
 </html>
-
-
-
