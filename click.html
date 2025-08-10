@@ -1,60 +1,60 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<title>클릭 횟수 게임</title>
-<style>
-  body { text-align: center; font-family: sans-serif; margin-top: 50px; }
-  button { font-size: 24px; padding: 20px 40px; cursor: pointer; }
-  #count, #best { font-size: 30px; margin-top: 20px; }
-</style>
+  <meta charset="UTF-8" />
+  <title>클릭 횟수 게임</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <h1>클릭 횟수 게임</h1>
+  <button id="clickBtn">누를 때마다 +1</button>
+  <p>현재 클릭: <span id="current">0</span></p>
+  <p>최고 기록: <span id="best">0</span></p>
 
-<h1>클릭 횟수 게임</h1>
-<button id="click-btn">누를 때마다 +1</button>
-<div id="count">현재 클릭: 0</div>
-<div id="best">최고 기록: 0</div>
+  <script>
+    const supabaseUrl = 'https://YOUR_PROJECT.supabase.co';
+    const supabaseKey = 'YOUR_PUBLIC_ANON_KEY';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script>
-  const supabaseUrl = 'https://koo131207.supabase.co'
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96ZnNwZHVsemtjamZ1aHhweGRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQyNDMyODMsImV4cCI6MjA2OTgxOTI4M30.aWNRfnlcgtXwJPX4qYsHzIbbX7E_J9Zq_xsLRt_z2Es';
-  const SUPABASE = supabase.createClient(supabaseUrl, supabaseKey)
+    let count = 0;
+    let best = 0;
 
-  let count = 0;
-  const btn = document.getElementById('click-btn');
-  const countDiv = document.getElementById('count');
-  const bestDiv = document.getElementById('best');
+    const currentEl = document.getElementById('current');
+    const bestEl = document.getElementById('best');
+    const button = document.getElementById('clickBtn');
 
-  async function fetchBest() {
-    const { data, error } = await SUPABASE
-      .from('clicks')
-      .select('count')
-      .eq('id', true)
-      .single()
+    button.addEventListener('click', async () => {
+      count++;
+      currentEl.textContent = count;
 
-    if (!error && data) {
-      bestDiv.textContent = '최고 기록: ' + data.count
-    }
-  }
+      if (count > best) {
+        best = count;
+        bestEl.textContent = best;
 
-  fetchBest();
+        const { error } = await supabase
+          .from('clicks')
+          .upsert([{ id: 1, best_clicks: best }]);
 
-  btn.onclick = async () => {
-    count++;
-    countDiv.textContent = '현재 클릭: ' + count;
+        if (error) {
+          console.error('Supabase 저장 오류:', error.message);
+        }
+      }
+    });
 
-    const { data, error } = await SUPABASE.rpc('increment_click')
-    if (error) {
-      console.log('Error:', error)
-      return;
-    }
+    (async () => {
+      const { data, error } = await supabase
+        .from('clicks')
+        .select('best_clicks')
+        .eq('id', 1)
+        .single();
 
-    // 클릭 후 최신 값 다시 가져오기
-    fetchBest();
-  }
-</script>
-
+      if (data) {
+        best = data.best_clicks;
+        bestEl.textContent = best;
+      } else if (error) {
+        console.error('Supabase 불러오기 오류:', error.message);
+      }
+    })();
+  </script>
 </body>
 </html>
