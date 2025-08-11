@@ -42,12 +42,28 @@
   <audio id="jokbal" src="https://raw.githubusercontent.com/yoonjaekoo/koo1331207/main/%EC%9E%A5%EC%B6%A9%EB%8F%99%20%EC%99%95%EC%A1%B1%EB%B0%9C%20%EB%B3%B4%EC%8C%88.mp3"></audio>
   <p>초록색 입체 그리드-solved.ac 배경 훔쳐옴</p>
 
+  <img id="scary" src="toothless.gif" alt="투슬리스" style="
+    display:none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: 9999;
+  " />
+
   <script>
     function go1() { window.location.href = "cps_test.html"; }
     function go2() { window.location.href = "posts.html"; }
     function go3() { window.location.href = "goose.html"; }
     function go4() { window.location.href = "click.html"; }
+
+    window.onload = function() {
+      if(sessionStorage.getItem('auth') !== 'true') {
+        document.getElementById('scary').style.display = 'block';
+      }
+    }
   </script>
 </body>
 </html>
-
