@@ -7,19 +7,24 @@
     function checkPassword() {
       const pw = document.getElementById("pw").value;
       if (pw === "koo131207") {
+        sessionStorage.setItem('auth', 'true');
         location.href = "main.html";
       } else {
         alert("장충동 왕족발 보쌈!!!!!\n비밀번호 틀림!!!!");
         const iframe = document.getElementById("jokbalSound");
-        iframe.src = iframe.src; // iframe 새로고침해서 소리 재생 시도
+        iframe.src = iframe.src; // 소리 재생 시도
       }
     }
 
     window.onload = () => {
+      if (sessionStorage.getItem('auth') === 'true') {
+        location.href = "main.html";
+        return;
+      }
       const input = document.getElementById("pw");
       input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
-          e.preventDefault(); // 기본 submit 막기
+          e.preventDefault();
           document.getElementById("checkBtn").click();
         }
       });
