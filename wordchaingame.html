@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>끝말잇기 게임 (CSV)</title>
+<title>끝말잇기 게임 (CSV, 명사만)</title>
 <style>
 body { font-family: sans-serif; padding: 20px; }
 input { padding: 5px; }
@@ -12,55 +12,43 @@ button { margin-left: 5px; }
 </head>
 <body>
 
-<h1>끝말잇기 게임 (CSV)</h1>
-<p>참고: 표준국어대사전 단어 사용 (이상한 단어 없음, 추정)</p>
-
-<div>
-  <span>사용자 점수: <span id="userScore">0</span></span>
-  &nbsp;&nbsp;
-  <span>컴퓨터 점수: <span id="compScore">0</span></span>
-</div>
+<h1>끝말잇기 게임 (CSV, 명사만)</h1>
 
 <div>
   <p>현재 단어: <span id="currentWord"></span></p>
 </div>
 
 <input type="text" id="wordInput" placeholder="단어 입력">
-<button id="submitBtn">제출</button>
-<button id="resetBtn">게임 초기화</button>
+<button onclick="submitWord()">제출</button>
+<button onclick="resetGame()">게임 초기화</button>
 
 <h3>게임 로그</h3>
 <div id="log"></div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  let userScore = 0;
-  let compScore = 0;
-  let currentWord = "";
-  let usedWords = [];
-  let allWords = [];
-  let turn = "user";
+let userScore = 0;
+let compScore = 0;
+let currentWord = "";
+let usedWords = [];
+let allWords = [];
+let turn = "user";
 
-  const userScoreEl = document.getElementById("userScore");
-  const compScoreEl = document.getElementById("compScore");
-  const currentWordEl = document.getElementById("currentWord");
-  const logEl = document.getElementById("log");
-  const inputEl = document.getElementById("wordInput");
-  const submitBtn = document.getElementById("submitBtn");
-  const resetBtn = document.getElementById("resetBtn");
+// CSV 읽기
+fetch("kr_korean.csv")
+  .then(res => res.text())
+  .then(text => {
+    const lines = text.split("\n");
+    for(let i=1;i<lines.length;i++){ // 헤더 건너뛰기
+        const row = lines[i].split(",");
+        const word = row[0]?.trim();
+        const pos = row[1]?.trim(); // 품사
+        if(word && pos === "명사") allWords.push(word);
+    }
+    logMessage("단어 리스트 로드 완료! 명사만 총 단어: " + allWords.length);
+  })
+  .catch(err => logMessage("단어 리스트 로드 실패: " + err));
 
-  function logMessage(msg){
-    logEl.innerHTML += msg + "<br>";
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-
-  function updateUI(){
-    userScoreEl.innerText = userScore;
-    compScoreEl.innerText = compScore;
-    currentWordEl.innerText = currentWord;
-  }
-
-  function getDuumEquivalent(char) {
+function getDuumEquivalent(char) {
     if(['라','래','로','뢰','루','르'].includes(char)) return String.fromCharCode(char.charCodeAt(0)-1024);
     if(['랴','려','례','료','류'].includes(char)) return String.fromCharCode(char.charCodeAt(0)-512);
     if(char=='리') return '이';
@@ -68,14 +56,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if(['냐','녀','녜','뇨','뉴'].includes(char)) return String.fromCharCode(char.charCodeAt(0)+512);
     if(char=='니') return '이';
     return null;
-  }
+}
 
-  function checkChain(lastChar, firstChar){
+function checkChain(lastChar, firstChar){
     const duum = getDuumEquivalent(lastChar);
     return firstChar === lastChar || (duum && firstChar === duum);
-  }
+}
 
-  function compTurn(){
+function compTurn(){
     if(!currentWord) return;
     let lastChar = currentWord.slice(-1);
     let candidates = allWords.filter(w => 
@@ -92,11 +80,12 @@ document.addEventListener("DOMContentLoaded", () => {
     logMessage("컴퓨터: " + choice);
     updateUI();
     turn = "user";
-  }
+}
 
-  function submitWord(){
-    let word = inputEl.value.trim();
-    inputEl.value = "";
+function submitWord(){
+    let input = document.getElementById("wordInput");
+    let word = input.value.trim();
+    input.value = "";
     if(!word) return;
 
     if(currentWord && !checkChain(currentWord.slice(-1), word[0])){
@@ -119,37 +108,29 @@ document.addEventListener("DOMContentLoaded", () => {
     updateUI();
     turn = "comp";
     setTimeout(compTurn, 500);
-  }
+}
 
-  function resetGame(){
+function resetGame(){
     userScore = 0;
     compScore = 0;
     currentWord = "";
     usedWords = [];
     turn = "user";
-    logEl.innerHTML = "";
+    document.getElementById("log").innerHTML = "";
     updateUI();
-  }
+}
 
-  submitBtn.addEventListener("click", submitWord);
-  resetBtn.addEventListener("click", resetGame);
+function logMessage(msg){
+    const log = document.getElementById("log");
+    log.innerHTML += msg + "<br>";
+    log.scrollTop = log.scrollHeight;
+}
 
-  // CSV 읽기
-  fetch("kr_korean.csv")
-    .then(res => res.text())
-    .then(text => {
-      const lines = text.split("\n");
-      for(let i=1;i<lines.length;i++){ // 헤더 건너뛰기
-          const row = lines[i].split(",");
-          const word = row[0]?.trim();
-          if(word) allWords.push(word);
-      }
-      logMessage("단어 리스트 로드 완료! 총 단어: " + allWords.length);
-    })
-    .catch(err => logMessage("단어 리스트 로드 실패: " + err));
-
-});
+function updateUI(){
+    document.getElementById("userScore").innerText = userScore;
+    document.getElementById("compScore").innerText = compScore;
+    document.getElementById("currentWord").innerText = currentWord;
+}
 </script>
-
 </body>
 </html>
