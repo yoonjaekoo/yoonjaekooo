@@ -1,120 +1,144 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8">
-<title>끝말잇기 게임 (CSV, 1인 플레이)</title>
-<style>
-body { font-family: sans-serif; padding: 20px; }
-input { padding: 5px; }
-button { margin-left: 5px; }
-#log { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
-</style>
+    <meta charset="UTF-8">
+    <title>끝말잇기 게임 (CSV, 1인 플레이)</title>
+    <style>
+        body { font-family: 'SF Pro Display', sans-serif; padding: 20px; background-color: #f8f8f8; }
+        input { padding: 8px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
+        button { margin-left: 5px; padding: 8px 14px; border-radius: 8px; border: none; background: #007aff; color: white; font-size: 15px; cursor: pointer; transition: background 0.3s; }
+        button:hover { background: #005ecf; }
+        #log { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; background: white; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        #currentWord { font-weight: bold; font-size: 1.4em; color: #007aff; transition: color 0.3s, transform 0.3s; }
+        .fade-in-up {
+            animation: fadeInUp 0.4s ease both;
+        }
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
 
 <h1>끝말잇기 게임 (CSV, 1인 플레이)</h1>
 
 <div>
-  <p>현재 단어: <span id="currentWord"></span></p>
+    <p>현재 단어: <span id="currentWord"></span></p>
 </div>
 
 <input type="text" id="wordInput" placeholder="단어 입력">
 <button onclick="submitWord()">제출</button>
-<button onclick="resetGame()">게임 초기화</button>
+<button onclick="resetGame()" style="background:#ff3b30;">게임 초기화</button>
 
 <h3>게임 로그</h3>
 <div id="log"></div>
 
 <script>
-let currentWord = "";
-let usedWords = [];
-let allWords = [];
+    let currentWord = "";
+    let usedWords = [];
+    let allWords = [];
 
-// CSV 읽기 (명사만)
-fetch("kr_korean.csv")
-  .then(res => res.text())
-  .then(text => {
-    const lines = text.split("\n");
-    for(let i=1;i<lines.length;i++){
-        const row = lines[i].split(",");
-        const word = row[0]?.trim().replace(/-/g, "");
-        const pos = row[1]?.trim();
-        if(word && pos === "명사") allWords.push(word);
-    }
-    logMessage("단어 리스트 로드 완료! 명사 총 단어: " + allWords.length);
-  })
-  .catch(err => logMessage("단어 리스트 로드 실패: " + err));
+    // CSV 읽기 (명사만)
+    fetch("kr_korean.csv")
+        .then(res => res.text())
+        .then(text => {
+            const lines = text.split("\n");
+            for(let i=1;i<lines.length;i++){
+                const row = lines[i].split(",");
+                const word = row[0]?.trim().replace(/-/g, "");
+                const pos = row[1]?.trim();
+                if(word && pos === "명사") allWords.push(word);
+            }
+            logMessage("단어 리스트 로드 완료! 명사 총 단어: " + allWords.length);
+        })
+        .catch(err => logMessage("단어 리스트 로드 실패: " + err));
 
-function getDuumEquivalent(char) {
-    if(['라','래','로','뢰','루','르'].includes(char)) return String.fromCharCode(char.charCodeAt(0)-1024);
-    if(['랴','려','례','료','류'].includes(char)) return String.fromCharCode(char.charCodeAt(0)-512);
-    if(char=='리') return '이';
-    if(['나','내','노','뇌','누','느'].includes(char)) return String.fromCharCode(char.charCodeAt(0)+1024);
-    if(['냐','녀','녜','뇨','뉴'].includes(char)) return String.fromCharCode(char.charCodeAt(0)+512);
-    if(char=='니') return '이';
-    return null;
-}
-
-function checkChain(lastChar, firstChar){
-    const duum = getDuumEquivalent(lastChar);
-    return firstChar === lastChar || (duum && firstChar === duum);
-}
-
-function compTurn(){
-    if(!currentWord) return;
-    let lastChar = currentWord.slice(-1);
-    let candidates = allWords.filter(w => 
-        !usedWords.includes(w) && checkChain(lastChar, w[0])
-    );
-    if(candidates.length === 0){
-        logMessage("컴퓨터가 유효한 단어를 찾지 못했습니다! 게임 종료!");
-        return;
-    }
-    let choice = candidates[Math.floor(Math.random()*candidates.length)];
-    usedWords.push(choice);
-    currentWord = choice;
-    logMessage("컴퓨터: " + choice);
-}
-
-function submitWord(){
-    let input = document.getElementById("wordInput");
-    let word = input.value.trim().replace(/-/g,"");
-    input.value = "";
-    if(!word) return;
-
-    if(currentWord && !checkChain(currentWord.slice(-1), word[0])){
-        logMessage(`끝말이 틀렸습니다! '${word}'는 '${currentWord.slice(-1)}' 또는 두음법칙 적용 글자로 시작해야 합니다.`);
-        return;
-    }
-    if(usedWords.includes(word)){
-        logMessage(word + " 이미 사용됨!");
-        return;
-    }
-    if(!allWords.includes(word)){
-        logMessage(word + " 유효하지 않은 단어!");
-        return;
+    function getDuumEquivalent(char) {
+        if(['라','래','로','뢰','루','르'].includes(char)) return String.fromCharCode(char.charCodeAt(0)-1024);
+        if(['랴','려','례','료','류'].includes(char)) return String.fromCharCode(char.charCodeAt(0)-512);
+        if(char=='리') return '이';
+        if(['나','내','노','뇌','누','느'].includes(char)) return String.fromCharCode(char.charCodeAt(0)+1024);
+        if(['냐','녀','녜','뇨','뉴'].includes(char)) return String.fromCharCode(char.charCodeAt(0)+512);
+        if(char=='니') return '이';
+        return null;
     }
 
-    usedWords.push(word);
-    currentWord = word;
-    logMessage("사용자: " + word);
+    function checkChain(lastChar, firstChar){
+        const duum = getDuumEquivalent(lastChar);
+        return firstChar === lastChar || (duum && firstChar === duum);
+    }
 
-    setTimeout(compTurn, 500);
-}
+    function compTurn(){
+        if(!currentWord) return;
+        let lastChar = currentWord.slice(-1);
+        let candidates = allWords.filter(w =>
+            !usedWords.includes(w) && checkChain(lastChar, w[0])
+        );
+        if(candidates.length === 0){
+            logMessage("💻 컴퓨터가 유효한 단어를 찾지 못했습니다! 게임 종료!");
+            return;
+        }
+        let choice = candidates[Math.floor(Math.random()*candidates.length)];
+        usedWords.push(choice);
+        currentWord = choice;
+        updateCurrentWord(choice);
+        logMessage("💻 컴퓨터: " + choice, true);
+    }
 
-function resetGame(){
-    currentWord = "";
-    usedWords = [];
-    document.getElementById("log").innerHTML = "";
-    document.getElementById("currentWord").innerText = "";
-}
+    function submitWord(){
+        let input = document.getElementById("wordInput");
+        let word = input.value.trim().replace(/-/g,"");
+        input.value = "";
+        if(!word) return;
 
-function logMessage(msg){
-    const log = document.getElementById("log");
-    log.innerHTML += msg + "<br>";
-    log.scrollTop = log.scrollHeight;
-    document.getElementById("currentWord").innerText = currentWord;
-}
+        if(currentWord && !checkChain(currentWord.slice(-1), word[0])){
+            logMessage(`❌ 끝말이 틀렸습니다! '${word}'는 '${currentWord.slice(-1)}' 또는 두음법칙 적용 글자로 시작해야 합니다.`);
+            return;
+        }
+        if(usedWords.includes(word)){
+            logMessage("⚠️ " + word + " 이미 사용됨!");
+            return;
+        }
+        if(!allWords.includes(word)){
+            logMessage("❌ " + word + " 유효하지 않은 단어!");
+            return;
+        }
+
+        usedWords.push(word);
+        currentWord = word;
+        updateCurrentWord(word);
+        logMessage("🙋 사용자: " + word, true);
+
+        setTimeout(compTurn, 500);
+    }
+
+    function resetGame(){
+        currentWord = "";
+        usedWords = [];
+        document.getElementById("log").innerHTML = "";
+        document.getElementById("currentWord").innerText = "";
+    }
+
+    function logMessage(msg, animated=false){
+        const log = document.getElementById("log");
+        let entry = document.createElement("div");
+        entry.innerHTML = msg;
+        if(animated) entry.classList.add("fade-in-up");
+        log.appendChild(entry);
+        log.scrollTop = log.scrollHeight;
+    }
+
+    function updateCurrentWord(word){
+        let cw = document.getElementById("currentWord");
+        cw.innerText = word;
+        cw.style.color = "#34c759"; // 애플 그린
+        cw.style.transform = "scale(1.2)";
+        setTimeout(() => {
+            cw.style.color = "#007aff";
+            cw.style.transform = "scale(1)";
+        }, 300);
+    }
 </script>
 
 </body>
