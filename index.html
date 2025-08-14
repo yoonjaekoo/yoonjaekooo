@@ -1,137 +1,110 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <title>비밀번호 확인 + 족발 소리</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&display=swap');
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            overflow: hidden;
-        }
-        .container {
-            background: rgba(255,255,255,0.95);
-            padding: 40px 50px;
-            border-radius: 25px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-            text-align: center;
-            max-width: 350px;
-            width: 90%;
-            animation: fadeIn 0.8s ease forwards;
-        }
-        h2 {
-            margin: 20px 0;
-            font-weight: 600;
-            color: #007aff;
-        }
-        input {
-            width: 100%;
-            padding: 12px 15px;
-            font-size: 16px;
-            border-radius: 15px;
-            border: 1px solid #ccc;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        input:focus {
-            border-color: #007aff;
-            box-shadow: 0 0 10px rgba(0,122,255,0.3);
-            transform: scale(1.02);
-        }
-        button {
-            margin-top: 15px;
-            width: 100%;
-            padding: 12px 0;
-            font-size: 16px;
-            border-radius: 15px;
-            border: none;
-            background: linear-gradient(145deg, #007aff, #005ecf);
-            color: #fff;
-            cursor: pointer;
-            box-shadow: 0 6px 18px rgba(0,0,0,0.2);
-            transition: all 0.3s ease;
-        }
-        button:hover {
-            background: linear-gradient(145deg, #34c759, #28a745);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
-        }
-        button:active {
-            transform: translateY(0) scale(0.97);
-        }
-        img {
-            width: 120px;
-            border-radius: 20px;
-            transition: transform 0.3s ease;
-        }
-        img:hover {
-            transform: scale(1.05) rotate(-3deg);
-        }
-        iframe {
-            margin-top: 15px;
-            border-radius: 15px;
-            width: 100%;
-            height: 110px;
-            overflow: hidden;
-            border: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-        }
-        iframe:active {
-            transform: scale(1.02);
-        }
-        @keyframes fadeIn {
-            from {opacity:0; transform: translateY(-20px);}
-            to {opacity:1; transform: translateY(0);}
-        }
-    </style>
+<meta charset="UTF-8">
+<title>비밀번호 확인</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&display=swap');
+    html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        overflow: hidden;
+    }
+    .container {
+        background: rgba(255,255,255,0.95);
+        padding: 40px 50px;
+        border-radius: 25px;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        text-align: center;
+        max-width: 350px;
+        width: 90%;
+        animation: fadeIn 0.8s ease forwards;
+    }
+    h2 { margin: 20px 0; font-weight: 600; color: #007aff; }
+    input {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 16px;
+        border-radius: 15px;
+        border: 1px solid #ccc;
+        outline: none;
+        transition: all 0.3s ease;
+    }
+    input:focus {
+        border-color: #007aff;
+        box-shadow: 0 0 10px rgba(0,122,255,0.3);
+        transform: scale(1.02);
+    }
+    button {
+        margin-top: 15px;
+        width: 100%;
+        padding: 12px 0;
+        font-size: 16px;
+        border-radius: 15px;
+        border: none;
+        background: linear-gradient(145deg, #007aff, #005ecf);
+        color: #fff;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+    }
+    button:hover {
+        background: linear-gradient(145deg, #34c759, #28a745);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+    button:active {
+        transform: translateY(0) scale(0.97);
+    }
+    @keyframes fadeIn {
+        from {opacity:0; transform: translateY(-20px);}
+        to {opacity:1; transform: translateY(0);}
+    }
+</style>
 </head>
 <body>
 <div class="container">
-    <img src="https://media.tenor.com/rr6G_nGWSkoAAAAj/oiiaioiiai.gif" alt="GIF" />
     <h2>비밀번호 입력</h2>
-    <iframe
-            id="jokbalSound"
-            src="https://www.myinstants.com/instant/jangcungdong-wangjogbal-bossam-15039/embed/"
-            title="족발 소리"
-    ></iframe>
     <input type="password" id="pw" placeholder="비밀번호 입력" />
-    <button id="checkBtn" onclick="checkPassword()">확인</button>
+    <button id="checkBtn">확인</button>
 </div>
 
 <script>
-    function checkPassword() {
-        const pw = document.getElementById("pw").value;
-        const iframe = document.getElementById("jokbalSound");
-        if (pw === "koo131207") {
+async function checkPassword() {
+    try {
+        const res = await fetch('pw.txt');
+        const pwFromFile = (await res.text()).trim();
+        const pwInput = document.getElementById('pw').value.trim();
+        if (pwInput === pwFromFile) {
             sessionStorage.setItem('auth', 'true');
             location.href = "main.html";
         } else {
-            alert("장충동 왕족발 보쌈!!!!!\n비밀번호 틀림!!!!");
-            iframe.src = iframe.src; // 소리 재생
+            alert("비밀번호가 틀렸습니다!");
         }
+    } catch(e) {
+        alert("비밀번호 파일 읽기 실패: " + e);
     }
+}
 
-    window.onload = () => {
-        if (sessionStorage.getItem('auth') === 'true') {
-            location.href = "main.html";
-            return;
+window.onload = () => {
+    if(sessionStorage.getItem('auth') === 'true') location.href = "main.html";
+
+    const input = document.getElementById("pw");
+    const btn = document.getElementById("checkBtn");
+    btn.addEventListener("click", checkPassword);
+    input.addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") {
+            e.preventDefault();
+            checkPassword();
         }
-        const input = document.getElementById("pw");
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") {
-                e.preventDefault();
-                document.getElementById("checkBtn").click();
-            }
-        });
-    };
+    });
+};
 </script>
 </body>
 </html>
