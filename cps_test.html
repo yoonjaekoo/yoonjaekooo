@@ -1,105 +1,158 @@
 <!DOCTYPE html>
-<meta charset="UTF-8">
-<html>
+<html lang="ko">
 <head>
-  <title>CPS 테스트</title>
-  <style>
-    body {
-      background-color: black;
-      color: skyblue;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    #clickBtn {
-      width: 150px;
-      height: 150px;
-      font-size: 24px;
-      background-color: gray;
-      color: skyblue;
-      border: none;
-      cursor: pointer;
-      border-radius: 10px;
-      transition: background-color 0.3s;
-    }
-    #clickBtn:active {
-      background-color: #555;
-    }
-    #clickBtn:disabled {
-      background-color: #333;
-      cursor: not-allowed;
-      color: #777;
-    }
-    input, label {
-      font-size: 18px;
-      background-color: black;
-      color: skyblue;
-      border: 1px solid skyblue;
-      padding: 5px 10px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-    }
-    #result, #countdown, #refreshMsg {
-      font-size: 24px;
-      margin-top: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>CPS 테스트</title>
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #66fcf1;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 30px;
+        }
+        h1 { margin-bottom: 20px; }
+        .container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            background-color: #1f2833;
+            border-radius: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(102, 252, 241, 0.4);
+            width: 20px;
+            height: 20px;
+            transform: scale(0);
+            animation: rippleEffect 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        @keyframes rippleEffect {
+            0% {
+                transform: scale(0);
+                opacity: 0.6;
+            }
+            50% {
+                transform: scale(5);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(10);
+                opacity: 0;
+            }
+        }
+        #clickBtn {
+            z-index: 1;
+            width: 120px;
+            height: 120px;
+            font-size: 24px;
+            border: none;
+            border-radius: 50%;
+            background-color: #45a29e;
+            color: #0b0c10;
+            cursor: pointer;
+        }
+        #clickBtn:disabled { background-color: #1f2833; color: #666; cursor: not-allowed; }
+        #timeInput {
+            margin-top: 15px;
+            padding: 5px 10px;
+            font-size: 16px;
+            width: 60px;
+            text-align: center;
+            border-radius: 8px;
+            border: 1px solid #66fcf1;
+            background-color: #0b0c10;
+            color: #66fcf1;
+        }
+        #countdown, #result, #refreshMsg {
+            margin-top: 15px;
+            font-size: 20px;
+        }
+        #refreshMsg { color: orange; }
+    </style>
 </head>
 <body>
-  <h1>CPS 테스트</h1>
-  <label for="timeInput">시간 (초): </label>
-  <input type="number" id="timeInput" value="5" min="1" max="60"><br>
-  <button id="clickBtn">클릭!</button>
-  <div id="countdown"></div>
-  <div id="result"></div>
-  <div id="refreshMsg" style="color: orange; margin-top: 15px;"></div>
 
-  <script>
+<h1>CPS 테스트</h1>
+<label>시간 (초): <input type="number" id="timeInput" value="5" min="1" max="60"></label>
+<div class="container" id="container">
+    <button id="clickBtn">클릭!</button>
+</div>
+
+<div id="countdown"></div>
+<div id="result"></div>
+<div id="refreshMsg"></div>
+
+<script>
     let clicks = 0;
-    let startTime = null;
     let running = false;
+    let startTime = null;
     let timer;
 
     const btn = document.getElementById('clickBtn');
+    const container = document.getElementById('container');
     const result = document.getElementById('result');
     const countdown = document.getElementById('countdown');
     const timeInput = document.getElementById('timeInput');
     const refreshMsg = document.getElementById('refreshMsg');
 
-    btn.addEventListener('click', () => {
-      const totalTime = Number(timeInput.value);
-      if (totalTime < 1 || totalTime > 60) {
-        alert('시간은 1초 이상 60초 이하로 입력하세요.');
-        return;
-      }
+    function createRipple(x, y) {
+        const rect = container.getBoundingClientRect();
+        const ripple = document.createElement('span');
+        ripple.className = 'ripple';
+        ripple.style.left = (x - rect.left - 10) + 'px';
+        ripple.style.top = (y - rect.top - 10) + 'px';
+        container.appendChild(ripple);
+        setTimeout(() => ripple.remove(), 800);
+    }
 
-      if (!running) {
-        running = true;
-        clicks = 0;
-        startTime = Date.now();
-        countdown.textContent = totalTime + '초 남음';
-        result.textContent = '';
-        refreshMsg.textContent = '';
-        btn.disabled = false;
+    container.addEventListener('click', (e) => {
+        createRipple(e.clientX, e.clientY);
+        const totalTime = Number(timeInput.value);
+        if (totalTime < 1 || totalTime > 60) { alert('1~60초 입력!'); return; }
 
-        timer = setInterval(() => {
-          const elapsed = (Date.now() - startTime) / 1000;
-          const left = Math.max(0, totalTime - elapsed).toFixed(1);
-          countdown.textContent = left + '초 남음';
+        if (!running) {
+            running = true;
+            clicks = 0;
+            startTime = Date.now();
+            countdown.textContent = totalTime + '초 남음';
+            result.textContent = '';
+            refreshMsg.textContent = '';
+            btn.disabled = false;
 
-          if (elapsed >= totalTime) {
-            clearInterval(timer);
-            const cps = (clicks / totalTime).toFixed(2);
-            result.textContent = cps + ' CPS';
-            countdown.textContent = '시간 종료!';
-            running = false;
-            btn.disabled = true;
-            refreshMsg.textContent = '테스트가 끝났습니다. 새로고침(F5)해서 다시 시작하세요.';
-          }
-        }, 100);
-      }
-      if (running) clicks++;
+            timer = setInterval(() => {
+                const elapsed = (Date.now() - startTime)/1000;
+                const left = Math.max(0, totalTime - elapsed).toFixed(1);
+                countdown.textContent = left + '초 남음';
+                if (elapsed >= totalTime) {
+                    clearInterval(timer);
+                    const cps = (clicks / totalTime).toFixed(2);
+                    result.textContent = cps + ' CPS';
+                    countdown.textContent = '시간 종료!';
+                    running = false;
+                    btn.disabled = true;
+                    refreshMsg.textContent = '새로고침(F5)해서 다시 시작';
+                }
+            }, 100);
+        }
+        if (running) clicks++;
     });
-  </script>
+
+    btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        container.click();
+    });
+</script>
+
 </body>
 </html>
