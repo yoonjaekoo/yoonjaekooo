@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<title>끝말잇기 게임 (CSV, 명사만)</title>
+<title>끝말잇기 게임 (CSV, 1인 플레이)</title>
 <style>
 body { font-family: sans-serif; padding: 20px; }
 input { padding: 5px; }
@@ -12,7 +12,7 @@ button { margin-left: 5px; }
 </head>
 <body>
 
-<h1>끝말잇기 게임 (CSV, 명사만)</h1>
+<h1>끝말잇기 게임 (CSV, 1인 플레이)</h1>
 
 <div>
   <p>현재 단어: <span id="currentWord"></span></p>
@@ -26,25 +26,22 @@ button { margin-left: 5px; }
 <div id="log"></div>
 
 <script>
-let userScore = 0;
-let compScore = 0;
 let currentWord = "";
 let usedWords = [];
 let allWords = [];
-let turn = "user";
 
-// CSV 읽기
+// CSV 읽기 (명사만)
 fetch("kr_korean.csv")
   .then(res => res.text())
   .then(text => {
     const lines = text.split("\n");
-    for(let i=1;i<lines.length;i++){ // 헤더 건너뛰기
+    for(let i=1;i<lines.length;i++){
         const row = lines[i].split(",");
-        const word = row[0]?.trim();
-        const pos = row[1]?.trim(); // 품사
+        const word = row[0]?.trim().replace(/-/g, "");
+        const pos = row[1]?.trim();
         if(word && pos === "명사") allWords.push(word);
     }
-    logMessage("단어 리스트 로드 완료! 명사만 총 단어: " + allWords.length);
+    logMessage("단어 리스트 로드 완료! 명사 총 단어: " + allWords.length);
   })
   .catch(err => logMessage("단어 리스트 로드 실패: " + err));
 
@@ -70,21 +67,18 @@ function compTurn(){
         !usedWords.includes(w) && checkChain(lastChar, w[0])
     );
     if(candidates.length === 0){
-        logMessage("컴퓨터가 유효한 단어를 찾지 못했습니다! 사용자 승리!");
+        logMessage("컴퓨터가 유효한 단어를 찾지 못했습니다! 게임 종료!");
         return;
     }
     let choice = candidates[Math.floor(Math.random()*candidates.length)];
     usedWords.push(choice);
     currentWord = choice;
-    compScore++;
     logMessage("컴퓨터: " + choice);
-    updateUI();
-    turn = "user";
 }
 
 function submitWord(){
     let input = document.getElementById("wordInput");
-    let word = input.value.trim();
+    let word = input.value.trim().replace(/-/g,"");
     input.value = "";
     if(!word) return;
 
@@ -103,34 +97,25 @@ function submitWord(){
 
     usedWords.push(word);
     currentWord = word;
-    userScore++;
     logMessage("사용자: " + word);
-    updateUI();
-    turn = "comp";
+
     setTimeout(compTurn, 500);
 }
 
 function resetGame(){
-    userScore = 0;
-    compScore = 0;
     currentWord = "";
     usedWords = [];
-    turn = "user";
     document.getElementById("log").innerHTML = "";
-    updateUI();
+    document.getElementById("currentWord").innerText = "";
 }
 
 function logMessage(msg){
     const log = document.getElementById("log");
     log.innerHTML += msg + "<br>";
     log.scrollTop = log.scrollHeight;
-}
-
-function updateUI(){
-    document.getElementById("userScore").innerText = userScore;
-    document.getElementById("compScore").innerText = compScore;
     document.getElementById("currentWord").innerText = currentWord;
 }
 </script>
+
 </body>
 </html>
