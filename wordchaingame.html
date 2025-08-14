@@ -43,9 +43,11 @@ let turn = "user";
 fetch("https://www.mediafire.com/file/92p637lmq5hdghw/all_words.json/file")
   .then(res => res.json())
   .then(data => {
-    allWords = data; // 전체 단어 배열
+    allWords = data;
     logMessage("단어 리스트 로드 완료!");
   })
+  .catch(err => logMessage("단어 리스트 로드 실패: " + err));
+
   .catch(err => logMessage("단어 리스트 로드 실패: " + err));
 
 function getDuumEquivalent(char) {
