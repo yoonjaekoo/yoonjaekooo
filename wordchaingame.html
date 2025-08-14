@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>끝말잇기 게임 (로컬 JSON)</title>
+<style>
+body { font-family: sans-serif; padding: 20px; }
+input { padding: 5px; }
+button { margin-left: 5px; }
+#log { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<h1>끝말잇기 게임 (로컬 JSON)</h1>
+
+<div>
+  <span>사용자 점수: <span id="userScore">0</span></span>
+  &nbsp;&nbsp;
+  <span>컴퓨터 점수: <span id="compScore">0</span></span>
+</div>
+
+<div>
+  <p>현재 단어: <span id="currentWord"></span></p>
+</div>
+
+<input type="text" id="wordInput" placeholder="단어 입력">
+<button onclick="submitWord()">제출</button>
+<button onclick="resetGame()">게임 초기화</button>
+
+<h3>게임 로그</h3>
+<div id="log"></div>
+
+<script>
+let userScore = 0;
+let compScore = 0;
+let currentWord = "";
+let usedWords = [];
+let allWords = [];
+let turn = "user";
+
+// MediaFire에서 JSON 가져오기
+fetch("https://www.mediafire.com/file/XXXXXX/all_words.json/file")
+  .then(res => res.json())
+  .then(data => {
+    allWords = data; // 전체 단어 배열
+    logMessage("단어 리스트 로드 완료!");
+  })
+  .catch(err => logMessage("단어 리스트 로드 실패: " + err));
+
+function getDuumEquivalent(char) {
+    if(['라','래','로','뢰','루','르'].includes(char)) return String.fromCharCode(char.charCodeAt(0)-1024);
+    if(['랴','려','례','료','류'].includes(char)) return String.fromCharCode(char.charCodeAt(0)-512);
+    if(char=='리') return '이';
+    if(['나','내','노','뇌','누','느'].includes(char)) return String.fromCharCode(char.charCodeAt(0)+1024);
+    if(['냐','녀','녜','뇨','뉴'].includes(char)) return String.fromCharCode(char.charCodeAt(0)+512);
+    if(char=='니') return '이';
+    return null;
+}
+
+function checkChain(lastChar, firstChar){
+    const duum = getDuumEquivalent(lastChar);
+    return firstChar === lastChar || (duum && firstChar === duum);
+}
+
+function compTurn(){
+    if(!currentWord) return;
+    let lastChar = currentWord.slice(-1);
+    let candidates = allWords.filter(w => 
+        !usedWords.includes(w) && checkChain(lastChar, w[0])
+    );
+    if(candidates.length === 0){
+        logMessage("컴퓨터가 유효한 단어를 찾지 못했습니다! 사용자 승리!");
+        return;
+    }
+    let choice = candidates[Math.floor(Math.random()*candidates.length)];
+    usedWords.push(choice);
+    currentWord = choice;
+    compScore++;
+    logMessage("컴퓨터: " + choice);
+    updateUI();
+    turn = "user";
+}
+
+function submitWord(){
+    let input = document.getElementById("wordInput");
+    let word = input.value.trim();
+    input.value = "";
+    if(!word) return;
+
+    if(currentWord && !checkChain(currentWord.slice(-1), word[0])){
+        logMessage(`끝말이 틀렸습니다! '${word}'는 '${currentWord.slice(-1)}' 또는 두음법칙 적용 글자로 시작해야 합니다.`);
+        return;
+    }
+    if(usedWords.includes(word)){
+        logMessage(word + " 이미 사용됨!");
+        return;
+    }
+    if(!allWords.includes(word)){
+        logMessage(word + " 유효하지 않은 단어!");
+        return;
+    }
+
+    usedWords.push(word);
+    currentWord = word;
+    userScore++;
+    logMessage("사용자: " + word);
+    updateUI();
+    turn = "comp";
+    setTimeout(compTurn, 500);
+}
+
+function resetGame(){
+    userScore = 0;
+    compScore = 0;
+    currentWord = "";
+    usedWords = [];
+    turn = "user";
+    document.getElementById("log").innerHTML = "";
+    updateUI();
+}
+
+function logMessage(msg){
+    const log = document.getElementById("log");
+    log.innerHTML += msg + "<br>";
+    log.scrollTop = log.scrollHeight;
+}
+
+function updateUI(){
+    document.getElementById("userScore").innerText = userScore;
+    document.getElementById("compScore").innerText = compScore;
+    document.getElementById("currentWord").innerText = currentWord;
+}
+</script>
+
+</body>
+</html>
