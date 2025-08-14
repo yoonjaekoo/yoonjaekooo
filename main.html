@@ -1,71 +1,121 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <title>메인 페이지</title>
-  <style>
-    body {
-      text-align: center;
-      font-family: sans-serif;
-      margin-top: 50px;
-      background-image: url('abstract_002_light.png');
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-    #goose {
-      width: 150px;
-      cursor: pointer;
-      margin-top: 30px;
-    }
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>메인 페이지</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch; /* iOS 탄성 스크롤 */
+            scroll-behavior: smooth; /* 부드러운 스크롤 */
+            background-image: url('abstract_002_light.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            text-align: center;
+        }
+        h1 {
+            margin-top: 50px;
+            font-size: 2em;
+            color: #007aff;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        p {
+            font-size: 1.1em;
+            color: #333;
+            margin: 10px 0;
+        }
+        #goose {
+            width: 150px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: transform 0.25s ease;
+        }
+        #goose:active {
+            transform: scale(1.1) rotate(-5deg);
+        }
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(145deg, #007aff, #005ecf);
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        button:hover {
+            background: linear-gradient(145deg, #34c759, #28a745);
+            transform: translateY(-2px);
+        }
+        button:active {
+            transform: translateY(0) scale(0.98);
+        }
+        #scary {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            object-fit: cover;
+            z-index: 9999;
+        }
+    </style>
 </head>
 <body>
-  <h1>윤재 웹사이트에 오신 것을 환영합니다</h1>
-  <p>당신은 윤재거나 윤재의 지인이군요!!!!!ヾ(•ω•`)o</p>
-  <p>거위 인형을 클릭해보세요! 제가 키우는 거위입니다. 뭐라고 하고있네요!</p>
+<h1>윤재 웹사이트에 오신 것을 환영합니다</h1>
+<p>당신은 윤재거나 윤재의 지인이군요!!!!!ヾ(•ω•`)o</p>
+<p>거위 인형을 클릭해보세요! 제가 키우는 거위입니다. 뭐라고 하고있네요!</p>
 
-  <div>
+<div>
     <button onclick="go1()">cps test</button>
     <button onclick="go2()">자유게시판</button>
     <button onclick="go3()">거위의 방</button>
     <button onclick="go4()">클릭 최고기록 세우기</button>
-  </div>
+    <button onclick="go5()">끝말잇기</button>
+</div>
 
-  <img id="goose" src="goose.jpg" onclick="document.getElementById('jokbal').play()" alt="거위" />
+<img id="goose" src="goose.jpg" alt="거위" />
 
-  <audio id="jokbal" src="https://raw.githubusercontent.com/yoonjaekoo/koo1331207/main/%EC%9E%A5%EC%B6%A9%EB%8F%99%20%EC%99%95%EC%A1%B1%EB%B0%9C%20%EB%B3%B4%EC%8C%88.mp3"></audio>
-  <p>초록색 입체 그리드-solved.ac 배경 훔쳐옴</p>
+<audio id="jokbal" src="https://raw.githubusercontent.com/yoonjaekoo/koo1331207/main/%EC%9E%A5%EC%B6%A9%EB%8F%99%20%EC%99%95%EC%A1%B1%EB%B0%9C%20%EB%B3%B4%EC%8C%88.mp3"></audio>
 
-  <img id="scary" src="toothless.gif" alt="투슬리스" style="
-    display:none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    object-fit: cover;
-    z-index: 9999;
-  " />
+<p>초록색 입체 그리드-solved.ac 배경 훔쳐옴</p>
 
-  <script>
+<img id="scary" src="toothless.gif" alt="투슬리스" />
+
+<script>
     function go1() { window.location.href = "cps_test.html"; }
     function go2() { window.location.href = "posts.html"; }
     function go3() { window.location.href = "goose.html"; }
     function go4() { window.location.href = "click.html"; }
-    function go5() { window.location.href = "wordchaingame.html" }
+    function go5() { window.location.href = "wordchaingame.html"; }
 
+    // 거위 클릭 시 사운드 + 흔들림
+    const goose = document.getElementById('goose');
+    const jokbal = document.getElementById('jokbal');
+    goose.addEventListener('click', () => {
+        jokbal.currentTime = 0;
+        jokbal.play();
+        goose.style.transform = 'scale(1.1) rotate(5deg)';
+        setTimeout(() => {
+            goose.style.transform = 'scale(1) rotate(0deg)';
+        }, 200);
+    });
+
+    // 첫 접속 시 scary 표시
     window.onload = function() {
-      if(sessionStorage.getItem('auth') !== 'true') {
-        document.getElementById('scary').style.display = 'block';
-      }
-    }
-  </script>
+        if(sessionStorage.getItem('auth') !== 'true') {
+            document.getElementById('scary').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('scary').style.display = 'none';
+            }, 2000);
+        }
+    };
+</script>
 </body>
 </html>
-
