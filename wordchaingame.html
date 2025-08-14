@@ -40,7 +40,7 @@ let allWords = [];
 let turn = "user";
 
 // MediaFire에서 JSON 가져오기
-fetch("https://www.mediafire.com/file/XXXXXX/all_words.json/file")
+fetch("https://download1528.mediafire.com/y8r4cobbri4gtk-JX33t-_JEPRSXhVKWi51NyXCwfoT57ptNXCPOYG4TncY78YZ5cgIvmXK8bn2dwTdVUm95PeiOm_6YjhH_vDgiJByA6BWWTKgxYKL3IxPO8KQTVaIhv5E0RM66gmqOIsUmcSAi3IJkVt0bMkLMtTPB6wF5-KFj5kc/92p637lmq5hdghw/all_words.json")
   .then(res => res.json())
   .then(data => {
     allWords = data; // 전체 단어 배열
