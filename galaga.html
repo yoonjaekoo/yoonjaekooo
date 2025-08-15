@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>갤러그 게임</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        canvas {
+            border: 2px solid #fff;
+            background: #000;
+        }
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(145deg, #007aff, #005ecf);
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #backButton:hover {
+            background: linear-gradient(145deg, #34c759, #28a745);
+        }
+        #instructions {
+            margin-top: 10px;
+            font-size: 1em;
+            color: #fff;
+            background: rgba(0,0,0,0.5);
+            padding: 5px 10px;
+            border-radius: 8px;
+        }
+        #score {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #ff0;
+        }
+    </style>
+</head>
+<body>
+<button id="backButton" onclick="goMain()">메인으로</button>
+<canvas id="galagaCanvas" width="800" height="600"></canvas>
+<div id="instructions">좌우로 이동, 스페이스로 발사</div>
+<div id="score">점수: 0</div>
+<script>
+    const canvas = document.getElementById('galagaCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let player = { x: 400, y: 550, width: 40, height: 20, speed: 5 };
+    let bullets = [];
+    let enemies = [];
+    let enemyBullets = [];
+    let score = 0;
+    let gameOver = false;
+    let canShoot = true;
+
+    let keys = {};
+
+    document.addEventListener('keydown', e => keys[e.key] = true);
+    document.addEventListener('keyup', e => keys[e.key] = false);
+
+    function spawnEnemy() {
+        return { x: Math.random() * (canvas.width - 40), y: -20, width: 40, height: 20, shootTimer: 0, alive: true };
+    }
+
+    for(let i = 0; i < 5; i++) enemies.push(spawnEnemy());
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'white';
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+
+        bullets.forEach(b => ctx.fillRect(b.x, b.y, 5, 10));
+        enemyBullets.forEach(b => ctx.fillRect(b.x, b.y, 5, 10));
+
+        enemies.forEach(e => { if(e.alive) ctx.fillRect(e.x, e.y, e.width, e.height); });
+    }
+
+    function update() {
+        if(gameOver) return;
+
+        if(keys['ArrowLeft'] && player.x > 0) player.x -= player.speed;
+        if(keys['ArrowRight'] && player.x + player.width < canvas.width) player.x += player.speed;
+        if(keys[' '] && canShoot) {
+            bullets.push({ x: player.x + player.width/2 - 2.5, y: player.y, width: 5, height: 10 });
+            canShoot = false;
+            setTimeout(() => canShoot = true, 250);
+        }
+
+        bullets.forEach((b, i) => {
+            b.y -= 7;
+            enemies.forEach(e => {
+                if(e.alive && b.x < e.x + e.width && b.x + 5 > e.x && b.y < e.y + e.height && b.y + 10 > e.y) {
+                    bullets.splice(i, 1);
+                    e.alive = false;
+                    score += 10;
+                    document.getElementById('score').innerText = `점수: ${score}`;
+                    setTimeout(() => Object.assign(e, spawnEnemy()), 700);
+                }
+            });
+            if(b.y < 0) bullets.splice(i, 1);
+        });
+
+        enemyBullets.forEach((b, i) => {
+            b.y += 5;
+            if(b.x < player.x + player.width && b.x + 5 > player.x && b.y < player.y + player.height && b.y + 10 > player.y) {
+                gameOver = true;
+                alert('게임 오버! 최종 점수: ' + score);
+                window.location.reload();
+            }
+            if(b.y > canvas.height) enemyBullets.splice(i, 1);
+        });
+
+        enemies.forEach(e => {
+            if(e.alive) {
+                e.y += 2;
+                e.shootTimer++;
+                if(e.shootTimer > 100) {
+                    enemyBullets.push({ x: e.x + e.width/2 - 2.5, y: e.y + e.height, width: 5, height: 10 });
+                    e.shootTimer = 0;
+                }
+                if(e.y > canvas.height) e.y = -20; // 화면 아래 가면 다시 위에서 내려오기
+            }
+        });
+    }
+
+    function gameLoop() {
+        update();
+        draw();
+        if(!gameOver) requestAnimationFrame(gameLoop);
+    }
+
+    function goMain() {
+        window.location.href = 'main.html';
+    }
+
+    gameLoop();
+</script>
+</body>
+</html>
