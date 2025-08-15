@@ -9,8 +9,8 @@
             padding: 0;
             height: 100%;
             overflow-y: scroll;
-            -webkit-overflow-scrolling: touch; /* iOS 탄성 스크롤 */
-            scroll-behavior: smooth; /* 부드러운 스크롤 */
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
             background-image: url('abstract_002_light.png');
             background-size: cover;
             background-position: center;
@@ -77,6 +77,7 @@
     <button onclick="go2()">자유게시판</button>
     <button onclick="go3()">거위의 방</button>
     <button onclick="go5()">끝말잇기</button>
+    <button onclick="goGalaga()">갤러그 게임</button>
 </div>
 
 <img id="goose" src="goose.jpg" alt="거위" />
@@ -85,6 +86,7 @@
 
 <p>초록색 입체 그리드-solved.ac 배경 훔쳐옴</p>
 <button onclick="goAbout()">About 페이지로 이동</button>
+
 
 <img id="scary" src="toothless.gif" alt="투슬리스" />
 
@@ -95,8 +97,8 @@
     function go4() { window.location.href = "click.html"; }
     function go5() { window.location.href = "wordchaingame.html"; }
     function goAbout() { window.location.href = "about.html"; }
+    function goGalaga() { window.location.href = "galaga.html"; }
 
-    // 거위 클릭 시 사운드 + 흔들림
     const goose = document.getElementById('goose');
     const jokbal = document.getElementById('jokbal');
     goose.addEventListener('click', () => {
@@ -108,7 +110,6 @@
         }, 200);
     });
 
-    // 첫 접속 시 scary 표시
     window.onload = function() {
         if(sessionStorage.getItem('auth') !== 'true') {
             document.getElementById('scary').style.display = 'block';
